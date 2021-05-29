@@ -48,8 +48,14 @@ class Www implements MiddlewareInterface
         }
 
         if ($uri->getHost() !== $host) {
+            $redirect = $uri->withHost($host);
+
+            if(in_array($uri->getPort(), [80, 443], true)) {
+                $redirect = $redirect->withPort(null);
+            }
+
             return $this->responseFactory->createResponse(301)
-                ->withHeader('Location', (string) $uri->withHost($host));
+                ->withHeader('Location', (string) $redirect);
         }
 
         return $handler->handle($request);
